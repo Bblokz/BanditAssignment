@@ -30,8 +30,9 @@ class EgreedyPolicy:
             a = np.random.randint(0,self.n_actions)
         else:
             best_options = np.argmax(self.estimates)
-            a = best_options[0]
-            print("Greedy: " + self.estimates + " with action " + a)
+            a = best_options
+            print("Greedy: " + str(self.estimates) + " with action " + str(a))
+
         return a
         
     def update(self,a,r):
