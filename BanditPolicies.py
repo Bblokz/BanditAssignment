@@ -29,8 +29,9 @@ class EgreedyPolicy:
         if rand < epsilon:
             a = np.random.randint(0,self.n_actions)
         else:
-            a = np.argmax(self.estimates)
-            a = a[0]
+            best_options = np.argmax(self.estimates)
+            a = best_options[0]
+            print("Greedy: " + self.estimates + " with action " + a)
         return a
         
     def update(self,a,r):
@@ -72,6 +73,7 @@ class UCBPolicy:
         pass
     
 def test():
+
     n_actions = 10
     env = BanditEnvironment(n_actions=n_actions) # Initialize environment    
     
