@@ -15,15 +15,28 @@ class EgreedyPolicy:
     def __init__(self, n_actions=10):
         self.n_actions = n_actions
         # TO DO: Add own code
+        self.estimates = np.zeros(n_actions)
+        self.steps = np.zeros(n_actions)
         pass
         
     def select_action(self, epsilon):
         # TO DO: Add own code
         a = np.random.randint(0,self.n_actions) # Replace this with correct action selection
+        # generate a random number between 0 and 1 and store it in rand using numpy
+        # if rand is smaller than epsilon, select a random action
+        # otherwise, select the greedy action
+        rand = np.random.uniform(0,1)
+        if rand < epsilon:
+            a = np.random.randint(0,self.n_actions)
+        else:
+            a = np.argmax(self.estimates)
+            a = a[0]
         return a
         
     def update(self,a,r):
         # TO DO: Add own code
+        self.steps[a] += 1
+        self.estimates[a] += (1/self.steps[a])*(r-self.estimates[a])
         pass
 
 class OIPolicy:
