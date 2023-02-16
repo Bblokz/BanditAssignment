@@ -88,7 +88,7 @@ class GradientBanditAlgorithm:
         self.n_actions = n_actions
         self.totalReward = 0
         self.preferences = np.zeros(n_actions)
-        self.steps = 0
+        self.steps = 1
         pass
 
     def policy(self):
@@ -99,12 +99,12 @@ class GradientBanditAlgorithm:
         return np.argmax(self.policy())
 
     def update(self, a, r, alpha):
-        self.steps += 1
         self.totalReward += r
         self.preferences[a] += alpha * (r - self.totalReward / self.steps) * (1 - self.policy()[a])
         for (i, p) in enumerate(self.preferences):
             if i != a:
                 self.preferences[i] -= alpha * (r - self.totalReward / self.steps) * self.policy()[i]
+        self.steps += 1
         pass
 
 
@@ -130,6 +130,12 @@ def test():
     r = env.act(a)  # sample reward
     pi.update(a, r)  # update policy
     print("Test UCB policy with action {}, received reward {}".format(a, r))
+
+    pi = GradientBanditAlgorithm(n_actions=n_actions)  # Initialize policy
+    a = pi.select_action()  # select action
+    r = env.act(a)  # sample reward
+    pi.update(a, r, 0.1)  # update policy
+    print("Test gradientBandit policy with action {}, received reward {}".format(a, r))
 
 
 if __name__ == '__main__':
