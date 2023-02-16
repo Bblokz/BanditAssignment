@@ -46,7 +46,6 @@ class OIPolicy:
 
     def __init__(self, n_actions=10, initial_value=0.0, learning_rate=0.1):
         self.n_actions = n_actions
-        # TO DO: Add own code
         self.estimates = np.zeros(n_actions)
         self.learning_rate = learning_rate
         pass
@@ -54,8 +53,7 @@ class OIPolicy:
     def select_action(self):
         # TO DO: Add own code
         # a = np.random.randint(0,self.n_actions) # Replace this with correct action selection
-        a = np.argmax(self.estimates)
-        return a
+        return np.argmax(self.estimates)
 
     def update(self, a, r):
         # TO DO: Add own code
@@ -67,17 +65,18 @@ class UCBPolicy:
 
     def __init__(self, n_actions=10):
         self.n_actions = n_actions
+        self.estimates = np.zeros(n_actions)
+        self.steps = np.zeros(n_actions)
         # TO DO: Add own code
         pass
 
     def select_action(self, c, t):
-        # TO DO: Add own code
-        # Replace this with correct action selection
-        a = np.random.randint(0, self.n_actions)
-        return a
+        # make sure we do not divide by zero
+        return np.argmax(self.estimates + c * np.sqrt(np.log(t) / (self.steps + 1e-5)))
 
     def update(self, a, r):
-        # TO DO: Add own code
+        self.steps[a] += 1
+        self.estimates[a] += (1/self.steps[a])*(r-self.estimates[a])
         pass
 
 
