@@ -31,18 +31,20 @@ def experiment(n_actions, n_timesteps, n_repetitions, smoothing_window):
     #     a = pi.select_action() # select action
     #     r = env.act(a) # sample reward
     #     pi.update(a,r) # update policy
-    plotHelper = LearningCurvePlot(title="test")
-    for j in range(1, n_repetitions):
+
+    plotHelper = LearningCurvePlot(title="UCB average reward over 1000 repetitions")
+    vectorResult = np.zeros(n_timesteps)
+    for j in range(n_repetitions):
         pi = UCBPolicy(n_actions=n_actions)  # Initialize policy
-        for i in range(1, n_timesteps):
+        for i in range(1, n_timesteps+1):
             a = pi.select_action(c=1.0, t=i)  # select action
             r = env.act(a)  # sample reward
+            vectorResult[i-1] += r
             pi.update(a, r)  # update policy
-            plotHelper.add_curve(pi.estimates, "UCB")
-        plotHelper.save("UCB.png")
-
-
-        print("Test UCB policy with action {}, received reward {}".format(a, r))
+        
+    plotHelper.add_curve(vectorResult/float(n_repetitions), "UCB")
+    plotHelper.save("UCB.png")
+    print("Test UCB policy with action {}, received reward {}".format(a, r))
 
     # Assignment 3: UCB
 
@@ -55,7 +57,7 @@ def experiment(n_actions, n_timesteps, n_repetitions, smoothing_window):
 
 if __name__ == '__main__':
     # experiment settings
-    n_actions = 3
+    n_actions = 10
     n_repetitions = 1000
     n_timesteps = 1000
     smoothing_window = 31
