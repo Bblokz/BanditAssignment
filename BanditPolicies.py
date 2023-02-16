@@ -32,7 +32,6 @@ class EgreedyPolicy:
             a = np.random.randint(0, self.n_actions)
         else:
             a = np.argmax(self.estimates)
-            print("Greedy: " + str(self.estimates) + " with action " + str(a))
 
         return a
 

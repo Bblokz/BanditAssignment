@@ -16,23 +16,47 @@ from Helper import LearningCurvePlot, ComparisonPlot, smooth
 def experiment(n_actions, n_timesteps, n_repetitions, smoothing_window):
     # To Do: Write all your experiment code here
 
-    # Assignment 1: e-greedy
     env = BanditEnvironment(n_actions=n_actions)
-    # pi = EgreedyPolicy(n_actions=n_actions)  # Initialize policy
-    # for i in range(n_repetitions):
-    #     a = pi.select_action(epsilon=0.1)  # select action
-    #     r = env.act(a)  # sample reward
-    #     pi.update(a, r)  # update policy
-    #     # print("Test e-greedy policy with action {}, received reward {}".format(a, r))
+
+    plotHelper = LearningCurvePlot(
+        title="Average reward algorithms over {} repetitions".format(n_repetitions))
+
+    # Assignment 1: e-greedy
+    print("Generating e-greedy plot")
+
+    vectorResult = np.zeros(n_timesteps)
+    for j in range(n_repetitions):
+        # Initialize policy
+        pi = EgreedyPolicy(n_actions=n_actions)
+        for i in range(1, n_timesteps+1):
+            a = pi.select_action(epsilon=0.1)  # select action
+            r = env.act(a)  # sample reward
+            vectorResult[i-1] += r
+            pi.update(a, r)  # update policy
+
+    plotHelper.add_curve(
+        smooth(vectorResult/float(n_repetitions), window=15), label='e-greedy Smooth')
 
     # Assignment 2: Optimistic init
-    # pi = OIPolicy(n_actions=n_actions,initial_value=1.0) # Initialize policy
-    # for i in range(n_repetitions):
-    #     a = pi.select_action() # select action
-    #     r = env.act(a) # sample reward
-    #     pi.update(a,r) # update policy
+    print("Generating IO plot")
 
-    plotHelper = LearningCurvePlot(title="UCB average reward over 1000 repetitions")
+    vectorResult = np.zeros(n_timesteps)
+    for j in range(n_repetitions):
+        # Initialize policy
+        pi = OIPolicy(n_actions=n_actions,
+                      initial_value=5.0, learning_rate=0.1)
+        for i in range(1, n_timesteps+1):
+            a = pi.select_action()  # select action
+            r = env.act(a)  # sample reward
+            vectorResult[i-1] += r
+            pi.update(a, r)  # update policy
+
+    plotHelper.add_curve(
+        smooth(vectorResult/float(n_repetitions), window=15), label='OI Smooth')
+
+    # Assignment 3: UCB
+    print("Generating UCB plot")
+
     vectorResult = np.zeros(n_timesteps)
     for j in range(n_repetitions):
         pi = UCBPolicy(n_actions=n_actions)  # Initialize policy
@@ -41,14 +65,12 @@ def experiment(n_actions, n_timesteps, n_repetitions, smoothing_window):
             r = env.act(a)  # sample reward
             vectorResult[i-1] += r
             pi.update(a, r)  # update policy
-        
-    plotHelper.add_curve(vectorResult/float(n_repetitions), "UCB")
+
+    # plotHelper.add_curve(vectorResult/float(n_repetitions), "UCB")
+    plotHelper.add_curve(
+        smooth(vectorResult/float(n_repetitions), window=15), label='UCB Smooth')
+
     plotHelper.save("UCB.png")
-    print("Test UCB policy with action {}, received reward {}".format(a, r))
-
-    # Assignment 3: UCB
-
-
 
     # Assignment 4: Comparison
 
