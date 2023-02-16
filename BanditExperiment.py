@@ -31,16 +31,23 @@ def experiment(n_actions, n_timesteps, n_repetitions, smoothing_window):
     #     a = pi.select_action() # select action
     #     r = env.act(a) # sample reward
     #     pi.update(a,r) # update policy
+    plotHelper = LearningCurvePlot(title="test")
+    for j in range(1, n_repetitions):
+        pi = UCBPolicy(n_actions=n_actions)  # Initialize policy
+        for i in range(1, n_timesteps):
+            a = pi.select_action(c=1.0, t=i)  # select action
+            r = env.act(a)  # sample reward
+            pi.update(a, r)  # update policy
+            plotHelper.add_curve(pi.estimates, "UCB")
+        plotHelper.save("UCB.png")
+
+
+        print("Test UCB policy with action {}, received reward {}".format(a, r))
 
     # Assignment 3: UCB
-    pi = UCBPolicy(n_actions=n_actions)  # Initialize policy
 
-    for i in range(1, n_repetitions):
-        a = pi.select_action(c=1.0, t=i)  # select action
-        r = env.act(a)  # sample reward
-        pi.update(a, r)  # update policy
 
-    print("Test UCB policy with action {}, received reward {}".format(a, r))
+
     # Assignment 4: Comparison
 
     pass
