@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
 Bandit environment
 Practical for course 'Reinforcement Learning',
@@ -79,6 +80,31 @@ class UCBPolicy:
     def update(self, a, r):
         self.steps[a] += 1
         self.estimates[a] += (1/self.steps[a])*(r-self.estimates[a])
+        pass
+
+class GradientBanditAlgorithm:
+
+    def __init__(self, n_actions=10):
+        self.n_actions = n_actions
+        self.totalReward = 0
+        self.preferences = np.zeros(n_actions)
+        self.steps = 0
+        pass
+
+    def policy(self):
+        return np.exp(self.preferences) / np.sum(np.exp(self.preferences))
+
+    def select_action(self):
+        # make sure we do not divide by zero
+        return np.argmax(self.policy())
+
+    def update(self, a, r, alpha):
+        self.steps += 1
+        self.totalReward += r
+        self.preferences[a] += alpha * (r - self.totalReward / self.steps) * (1 - self.policy()[a])
+        for (i, p) in enumerate(self.preferences):
+            if i != a:
+                self.preferences[i] -= alpha * (r - self.totalReward / self.steps) * self.policy()[i]
         pass
 
 
