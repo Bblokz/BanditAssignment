@@ -67,12 +67,14 @@ class UCBPolicy:
         self.n_actions = n_actions
         self.estimates = np.zeros(n_actions)
         self.steps = np.zeros(n_actions)
+        self.steps += 1e-5
+
         # TO DO: Add own code
         pass
 
     def select_action(self, c, t):
         # make sure we do not divide by zero
-        return np.argmax(self.estimates + c * np.sqrt(np.log(t) / (self.steps + 1e-5)))
+        return np.argmax(self.estimates + c * np.sqrt(np.log(t) / (self.steps)))
 
     def update(self, a, r):
         self.steps[a] += 1
