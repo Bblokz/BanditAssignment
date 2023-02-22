@@ -23,10 +23,10 @@ def experiment(n_actions, n_timesteps, n_repetitions, smoothing_window):
         title="Average performance e-greedy over {} repetitions".format(n_repetitions))
 
     for e in eHyper:
-        print("running e-greedy value ", str(e))
+        print("running e-greedy value "+ str(e))
         result = run_egreedy(n_actions, n_timesteps, n_repetitions, e)
         plotHelper.add_curve(
-            smooth(result/float(n_repetitions), window=smoothing_window), label='e-greedy value '+str(e))
+            smooth(result/float(n_repetitions), window=smoothing_window), label='e-greedy value '+ str(e))
 
     plotHelper.save("egreedy.png")
     # Assignment 4: Comparison
