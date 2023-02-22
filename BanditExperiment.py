@@ -19,18 +19,61 @@ def experiment(n_actions, n_timesteps, n_repetitions, smoothing_window):
     # env = BanditEnvironment(n_actions=n_actions)
     # Assignment 1: egreedy
     eHyper = [0.01, 0.05, 0.1, 0.25]
+    sumResultEGreedy = np.zeros(len(eHyper))
     plotHelper = LearningCurvePlot(
         title="Average performance e-greedy over {} repetitions".format(n_repetitions))
 
-    for e in eHyper:
-        print("running e-greedy value "+ str(e))
+    for index, e in enumerate(eHyper):
+        print("running e-greedy value " + str(e))
         result = run_egreedy(n_actions, n_timesteps, n_repetitions, e)
+        # average of result epsilon over n_timesteps.
+        sumResultEGreedy[index] = sum(result)/(n_timesteps * n_repetitions)
         plotHelper.add_curve(
-            smooth(result/float(n_repetitions), window=smoothing_window), label='e-greedy value '+ str(e))
+            smooth(result/float(n_repetitions), window=smoothing_window), label='e-greedy value ' + str(e))
 
     plotHelper.save("egreedy.png")
+
+    # Assignment 2: Optimistic Initialization
+    initHyper = [0.1, 0.5, 1.0, 2.0]
+    sumResultOI = np.zeros(len(initHyper))
+    plotHelper = LearningCurvePlot(
+        title="Average performance Optimistic Initialization values over {} repetitions".format(n_repetitions))
+
+    for index, init in enumerate(initHyper):
+        print("running OI value " + str(init))
+        result = run_OI(n_actions, n_timesteps, n_repetitions, 0.1, init)
+        sumResultOI[index] = sum(result)/(n_timesteps * n_repetitions)
+        plotHelper.add_curve(
+            smooth(result/float(n_repetitions), window=smoothing_window), label='OI value ' + str(init))
+
+    plotHelper.save("OI.png")
+
+    # Assignment 3: Upper Confidence Bounds
+    cHyper = [0.01, 0.05, 0.1, 0.25, 0.5, 1.0]
+
+    sumResultUCB = np.zeros(len(cHyper))
+
+    plotHelper = LearningCurvePlot(
+        title="Average performance Upper Confidence Bounds over {} repetitions".format(n_repetitions))
+
+    for index, c in enumerate(cHyper):
+        print("running UCB value " + str(c))
+        result = run_ucb(n_actions, n_timesteps, n_repetitions, c)
+        sumResultUCB[index] = sum(result)/(n_timesteps * n_repetitions)
+        plotHelper.add_curve(
+            smooth(result/float(n_repetitions), window=smoothing_window), label='UCB value ' + str(c))
+
+    plotHelper.save("UCB.png")
+
     # Assignment 4: Comparison
-    # run_compare(n_actions, n_timesteps, n_repetitions, smoothing_window)
+    plotHelper = ComparisonPlot(
+        title="Average reward algorithms over {} repetitions".format(n_repetitions))
+
+    plotHelper.add_curve(eHyper, sumResultEGreedy, label='e-greedy')
+    plotHelper.add_curve(initHyper, sumResultOI, label='OI')
+    plotHelper.add_curve(cHyper, sumResultUCB, label='UCB')
+
+    plotHelper.save("Compare.png")
 
     pass
 
@@ -51,7 +94,7 @@ def run_egreedy(n_actions, n_timesteps, n_repetitions, eHyper):
     return vectorResult
 
 
-def run_IO(n_actions, n_timesteps, n_repetitions, learnHyper, initHyper):
+def run_OI(n_actions, n_timesteps, n_repetitions, learnHyper, initHyper):
     vectorResult = np.zeros(n_timesteps)
     for j in range(n_repetitions):
         # Initialize policy
@@ -79,38 +122,6 @@ def run_ucb(n_actions, n_timesteps, n_repetitions, cHyper):
             pi.update(a, r)  # update policy
 
     return vectorResult
-
-
-def run_compare(n_actions, n_timesteps, n_repetitions, smoothing_window):
-    plotHelper = LearningCurvePlot(
-        title="Average reward algorithms over {} repetitions".format(n_repetitions))
-
-    # Assignment 1: e-greedy
-    print("Generating e-greedy plot")
-
-    vectorResult = run_egreedy(n_actions, n_timesteps, n_repetitions, 0.1)
-
-    plotHelper.add_curve(
-        smooth(vectorResult/float(n_repetitions), window=smoothing_window), label='e-greedy Smooth')
-
-    # Assignment 2: Optimistic init
-    print("Generating IO plot")
-
-    vectorResult = run_IO(n_actions, n_timesteps, n_repetitions, 0.1, 5.0)
-
-    plotHelper.add_curve(
-        smooth(vectorResult/float(n_repetitions), window=smoothing_window), label='OI Smooth')
-
-    # Assignment 3: UCB
-    print("Generating UCB plot")
-
-    vectorResult = run_ucb(n_actions, n_timesteps, n_repetitions, 2.0)
-
-    # plotHelper.add_curve(vectorResult/float(n_repetitions), "UCB")
-    plotHelper.add_curve(
-        smooth(vectorResult/float(n_repetitions), window=smoothing_window), label='UCB Smooth')
-
-    plotHelper.save("Compare.png")
 
 
 if __name__ == '__main__':
