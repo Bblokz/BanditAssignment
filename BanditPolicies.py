@@ -48,6 +48,7 @@ class OIPolicy:
         self.n_actions = n_actions
         self.estimates = np.zeros(n_actions)
         self.learning_rate = learning_rate
+        self.estimates += initial_value
         pass
 
     def select_action(self):
