@@ -14,19 +14,15 @@ from BanditEnvironment import BanditEnvironment
 
 class EgreedyPolicy:
 
+    # Initialize policy: set number of actions and initialize estimates.
     def __init__(self, n_actions=10):
         self.n_actions = n_actions
-        # TO DO: Add own code
         self.estimates = np.zeros(n_actions)
         self.steps = np.zeros(n_actions)
         pass
 
+    # Select action: select action according to epsilon-greedy policy.
     def select_action(self, epsilon):
-        # TO DO: Add own code
-        # Replace this with correct action selection
-        # generate a random number between 0 and 1 and store it in rand using numpy
-        # if rand is smaller than epsilon, select a random action
-        # otherwise, select the greedy action
         rand = np.random.uniform(0, 1)
         if rand < epsilon:
             a = np.random.randint(0, self.n_actions)
@@ -35,8 +31,8 @@ class EgreedyPolicy:
 
         return a
 
+    # Update policy: update estimates of action values.
     def update(self, a, r):
-        # TO DO: Add own code
         self.steps[a] += 1
         self.estimates[a] += (1/self.steps[a])*(r-self.estimates[a])
         pass
@@ -44,6 +40,8 @@ class EgreedyPolicy:
 
 class OIPolicy:
 
+    # Initialize policy: set number of actions and initialize estimates.
+    # Set learning rate and optimisitc initial value.
     def __init__(self, n_actions=10, initial_value=0.0, learning_rate=0.1):
         self.n_actions = n_actions
         self.estimates = np.zeros(n_actions)
@@ -51,32 +49,33 @@ class OIPolicy:
         self.estimates += initial_value
         pass
 
+    # Select action: select action according to greedy policy.
     def select_action(self):
-        # TO DO: Add own code
-        # a = np.random.randint(0,self.n_actions) # Replace this with correct action selection
         return np.argmax(self.estimates)
 
+    # Update policy: update estimates of action values.
     def update(self, a, r):
-        # TO DO: Add own code
         self.estimates[a] += self.learning_rate * (r-self.estimates[a])
         pass
 
 
 class UCBPolicy:
 
+    # Initialize policy: set number of actions and initialize estimates.
+    # Set steps to small non-zero value to avoid division by zero.
     def __init__(self, n_actions=10):
         self.n_actions = n_actions
         self.estimates = np.zeros(n_actions)
         self.steps = np.zeros(n_actions)
         self.steps += 1e-3
-        # TO DO: Add own code
         pass
 
+    # Select action: select action according to UCB policy.
     def select_action(self, c, t):
-        # make sure we do not divide by zero
         x = np.argmax(self.estimates + c * np.sqrt(np.log(t) / (self.steps)))
         return x
 
+    # Update policy: update estimates of action values.
     def update(self, a, r):
         self.steps[a] += 1
         self.estimates[a] += (1/self.steps[a])*(r-self.estimates[a])
@@ -84,6 +83,7 @@ class UCBPolicy:
 
 class GradientBanditAlgorithm:
 
+    # Initialize policy: set number of actions and initialize preferences.
     def __init__(self, n_actions=10):
         self.n_actions = n_actions
         self.totalReward = 0
@@ -94,10 +94,13 @@ class GradientBanditAlgorithm:
     def policy(self):
         return np.exp(self.preferences) / np.sum(np.exp(self.preferences))
 
+    # Select action: select action according to gradient bandit policy.
     def select_action(self):
-        # make sure we do not divide by zero
         return np.argmax(self.policy())
 
+    # Update policy: update preferences of action values.
+    # The update rule is given by the gradient of the log-likelihood.
+    # Note: alpha is the learning rate.
     def update(self, a, r, alpha):
         self.totalReward += r
         self.preferences[a] += alpha * (r - self.totalReward / self.steps) * (1 - self.policy()[a])
